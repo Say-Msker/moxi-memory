@@ -1,0 +1,5 @@
+﻿# 密钥与个人数据不上云
+*.err.log
+HANDOFF-*.md
+**/codex-chunks/
+.env
