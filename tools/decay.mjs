@@ -229,7 +229,7 @@ function decideLifecycle(fm, rel, body = '') {
     if (status !== 'active' && status !== 'restored') {
       return { ...base, action: 'skip', why: `status=${status}，不在自动摘要范围` };
     }
-    const threshold = tier === 'L1' ? 30 : 90;
+    const threshold = tier === 'L1' ? 90 : 180;
     if (age < threshold) {
       return {
         ...base,
@@ -719,10 +719,12 @@ function prepareLifecyclePlan(rows) {
       const bodyBytes = Buffer.byteLength(row.body, 'utf8');
       const outputBytes = Buffer.byteLength(shortened.output, 'utf8');
       if (outputBytes >= bodyBytes) {
-        skipped.push({
+        // 短页面摘要化反而变长：不再原地打转，直接进归档通道
+        actionable.push({
           ...row,
-          action: 'skip',
-          why: `摘要未变短（${bodyBytes}→${outputBytes} 字节），保留原页`,
+          action: 'archive',
+          targetStatus: 'archived',
+          why: `${row.why}｜摘要化反而变长（${bodyBytes}→${outputBytes} 字节），直接归档`,
         });
         continue;
       }

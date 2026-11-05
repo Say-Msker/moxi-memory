@@ -59,7 +59,7 @@ node tools\decay.mjs                       # 干跑：列出候选（改什么�
 node tools\decay.mjs --lifecycle --dry-run # 2.0 生命周期：只读预测，零写入
 node tools\decay.mjs --lifecycle           # 真执行：摘要 / 归档 / L3 细节归档
 node tools\decay.mjs --anchors             # 重建 anchors.md
-node tools\decay.mjs --restore <路径>      # 把归档页接回原路径
+node tools\decay.mjs --restore <原路径>    # 传原路径（不是 archive/ 下的路径），把归档页接回来
 node tools\decay.mjs --today=2028-01-01    # 模拟日期（验收用）
 ```
 
