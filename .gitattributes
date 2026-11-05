@@ -1,0 +1,6 @@
+# 记忆库的所有文本一律 LF：CRLF 会让 frontmatter 解析整段失效
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.zip binary
