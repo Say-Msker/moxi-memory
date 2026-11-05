@@ -36,12 +36,14 @@
 
 分层与阈值、`status` 五态、归档四字段、审计格式，写在 [`docs/spec-v1.1.md`](docs/spec-v1.1.md)。
 
-## 快速开始（Windows）
+## 快速开始
 
-前置：Node ≥ 22；装了 `dsh-plugin-memory`（或任何按本协议读 markdown 的运行时）。
+前置：Node ≥ 22。可选：`dsh-plugin-memory`（或任何按本协议读 markdown 的运行时）。
+
+### Windows
 
 ```powershell
-# 1. 建库（把模板铺进 %USERPROFILE%\.memory）
+# 1. 建库（默认铺进 %USERPROFILE%\.memory，也可 -Target 指定）
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 # 2. 填 SOUL.md：把 <!-- ... --> 换成你自己的话。空着比编好。
@@ -50,7 +52,59 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 node tools\decay.mjs --lifecycle --dry-run   # 应输出「将降 0 页」
 ```
 
+### macOS / Linux
+
+```bash
+chmod +x install.sh
+./install.sh ~/.memory        # 目标目录必须为空，或给一个不存在的路径
+node ~/.memory/tools/decay.mjs --lifecycle --dry-run
+```
+
+`install.sh` 只做三件事：建目录、拷六个模板、拷 `tools/decay.mjs`。不装依赖、不联网、不改系统。
+
+### 手动安装（任何平台，或脚本跑不起来时）
+
+建这十个目录：
+
+```
+identity  user  sea  skills  decisions  projects/active  projects/archive
+concepts  archive  raw  tools
+```
+
+把 `template/` 里的六个文件拷到库根：`SOUL.md` `MEMORY.md` `index.md` `log.md` `anchors.md` `BOOTSTRAP.md`，再拷 `tools/decay.mjs`。
+
+两个硬要求：**UTF-8 无 BOM**、**LF 换行**。用 Windows 记事本另存容易带 BOM，用 `file` 或 `xxd` 确认一下前三个字节不是 `EF BB BF`。
+
+### 装完长什么样
+
+```
+~/.memory/
+├── SOUL.md           ← 你已经改过的那份
+├── MEMORY.md
+├── BOOTSTRAP.md      ← status: pending，铸魂完自己改成 complete
+├── index.md          ← 只有元记忆几行，还没有内容页
+├── log.md            ← 只有一行 install
+├── anchors.md        ← 空表
+├── identity/         └── 空
+├── user/             └── 空
+├── sea/              └── 空
+├── skills/ decisions/ projects/ concepts/ archive/ raw/   └── 都空
+└── tools/decay.mjs
+```
+
+自检通过时终端长这样：
+
+```
+扫描 0 页（活动页 0 / archive 只读 0），今天 2026-11-05
+将降 0 页
+已降 0 页
+跳过 0 页（逐条原因）
+dry-run 结束：未写文件、未改索引、未重建锚点、未提交 git。
+```
+
 之后每次会话：启动读 `SOUL.md` + `MEMORY.md` + `index.md`；收尾写一条 digest 进 `log.md`。
+
+> **平台说明**：整条链路只在 **Windows + DeepSeek Harness + dsh-plugin-memory** 上实跑过（含摘要化、归档、恢复、自动提交）。`install.sh` 在 Git Bash 下测过，真机 macOS/Linux 未测。没装插件时脚本仍能跑，只是 `index.md` 由脚本内置规则维护（会打印「未找到 dsh-memory」），也没有自动注入。
 
 ## 工具
 
