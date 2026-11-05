@@ -88,3 +88,7 @@ powershell -File .\scripts\scan-sensitive.ps1
 MIT。不承诺维护；这是一份从实际使用里长出来的协议，不是产品。
 
 命名与设计来自使用者与 agent 的日常实践；生命周期脚本由另一条会话线实施并验收。
+
+## 故事与完整说明
+
+为什么要做成这样、我们丢过什么、三条硬规矩怎么踩出来的：[docs/story-and-guide.md](docs/story-and-guide.md)。
