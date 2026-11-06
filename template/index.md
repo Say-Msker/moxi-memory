@@ -13,14 +13,20 @@
 
 ## identity（自我）
 
-- [我是谁](identity/core.md) — <!-- 一句话 -->
-- [我说话的样子](identity/voice.md) — <!-- 一句话 -->
-- [心光（此刻在看什么）](identity/attention.md) — <!-- 一句话 -->
+<!-- 建了页再取消下面注释；链接指向不存在的页会让 lint 失败 -->
+
+<!--
+- [我是谁](identity/core.md) — 一句话。
+- [我说话的样子](identity/voice.md) — 一句话。
+- [心光（此刻在看什么）](identity/attention.md) — 一句话。
+-->
 
 ## user（关于用户）
 
-- [用户是谁](user/profile.md) — <!-- 一句话 -->
-- [偏好与规矩](user/preferences.md) — <!-- 一句话 -->
+<!--
+- [用户是谁](user/profile.md) — 一句话。
+- [偏好与规矩](user/preferences.md) — 一句话。
+-->
 
 ## sea（识海：经历节点）
 

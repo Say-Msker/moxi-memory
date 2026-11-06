@@ -87,7 +87,7 @@ archived_at: 2026-11-06                        # 归档日期
 
 ```
 ## [YYYY-MM-DD] decay | skills/reading-books.md L2→L1 (summarized)
-理由：180 天未访问；结论已并入 projects/active/douyin-channel.md
+理由：180 天未访问；结论已并入 projects/active/<项目>.md
 原文：archive/skills/reading-books.md
 恢复：node tools/decay.mjs --restore skills/reading-books.md
 ```

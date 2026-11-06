@@ -174,6 +174,8 @@ function lifecycleSkipReason(fm, rel) {
     return 'identity/user 页面永不自动降级';
   }
   if (statusOf(fm) === 'protected') return '受保护（protected）';
+  // 3.0 吸收：被纠正过的页留着原文当证据，改不改由人拍，不自动瘦身/归档
+  if (String(fm.revised_by || '').trim()) return '带修订记录（revised_by），不自动降级';
   if (statusOf(fm) === 'archived') return '已归档（archived）';
   if (statusOf(fm) === 'forgotten') return '已标记遗忘（forgotten）';
   if (statusOf(fm) === 'fading') return '旧版 fading 状态，交由显式处理';
@@ -229,7 +231,7 @@ function decideLifecycle(fm, rel, body = '') {
     if (status !== 'active' && status !== 'restored') {
       return { ...base, action: 'skip', why: `status=${status}，不在自动摘要范围` };
     }
-    const threshold = tier === 'L1' ? 90 : 180;
+    const threshold = tier === 'L1' ? 30 : 90;
     if (age < threshold) {
       return {
         ...base,
@@ -440,7 +442,7 @@ function rebuildAnchors(rows) {
   const lines = [];
   lines.push('# 记忆锚点（Anchors）');
   lines.push('');
-  lines.push('> 项目约定的：重要记忆留一根锚，靠锚点词就能想起来，不必把整页塞进上下文。');
+  lines.push('> 约定：重要记忆留一根锚，靠锚点词就能想起来，不必把整页塞进上下文。');
   lines.push('> 由 `node tools/decay.mjs --anchors` 自动生成，别手改。归档的页面原文在 `archive/`，靠锚点找回来。');
   lines.push('');
   lines.push(`最后重建：${TODAY}`);
@@ -576,8 +578,10 @@ function addIndexEntry(rel, fm) {
 function runMemoryIndexWrite() {
   const candidates = [];
   if (process.env.DSH_MEMORY_CLI) candidates.push(process.env.DSH_MEMORY_CLI);
-  // 也允许用环境变量直接指定 dsh-memory 入口；不再写死个人机器路径
-  if (process.env.DSH_MEMORY_ENTRY) candidates.push(process.env.DSH_MEMORY_ENTRY);
+  for (const guess of [
+    path.join(ROOT, 'node_modules', 'dsh-plugin-memory', 'scripts', 'memory.mjs'),
+    path.join(process.env.APPDATA || '', 'npm', 'node_modules', 'dsh-plugin-memory', 'scripts', 'memory.mjs')
+  ]) candidates.push(guess);
   try {
     const found = execFileSync('where.exe', ['dsh-memory.cmd'], {
       encoding: 'utf8',
@@ -585,7 +589,7 @@ function runMemoryIndexWrite() {
     }).split(/\r?\n/).find(Boolean);
     if (found) candidates.push(found.trim());
   } catch {
-    // The known profile path above is the normal installation.
+    // 没装 dsh-memory CLI 就跳过这一步：index.md 由人手动维护同样合法。
   }
   for (const candidate of candidates) {
     if (!candidate || !fs.existsSync(candidate)) continue;
@@ -719,12 +723,10 @@ function prepareLifecyclePlan(rows) {
       const bodyBytes = Buffer.byteLength(row.body, 'utf8');
       const outputBytes = Buffer.byteLength(shortened.output, 'utf8');
       if (outputBytes >= bodyBytes) {
-        // 短页面摘要化反而变长：不再原地打转，直接进归档通道
-        actionable.push({
+        skipped.push({
           ...row,
-          action: 'archive',
-          targetStatus: 'archived',
-          why: `${row.why}｜摘要化反而变长（${bodyBytes}→${outputBytes} 字节），直接归档`,
+          action: 'skip',
+          why: `摘要未变短（${bodyBytes}→${outputBytes} 字节），保留原页`,
         });
         continue;
       }

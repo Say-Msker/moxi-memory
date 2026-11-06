@@ -31,7 +31,9 @@
 ├── skills/ decisions/ projects/ concepts/
 ├── archive/                   # 归档页（镜像原目录，只读）
 ├── raw/                       # 不可变源材料
-└── tools/decay.mjs            # 生命周期脚本
+└── tools/
+    ├── decay.mjs              # 生命周期脚本（摘要 / 归档 / 恢复 / 锚点）
+    └── lint.mjs               # 自检：头信息、trust、summary、索引完整性
 ```
 
 分层与阈值、`status` 五态、归档四字段、审计格式，写在 [`docs/spec-v1.1.md`](docs/spec-v1.1.md)。
@@ -49,6 +51,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 # 2. 填 SOUL.md：把 <!-- ... --> 换成你自己的话。空着比编好。
 
 # 3. 自检
+node tools\lint.mjs                        # 应输出 ok — no problems found
 node tools\decay.mjs --lifecycle --dry-run   # 应输出「将降 0 页」
 ```
 
@@ -115,9 +118,17 @@ node tools\decay.mjs --lifecycle           # 真执行：摘要 / 归档 / L3 �
 node tools\decay.mjs --anchors             # 重建 anchors.md
 node tools\decay.mjs --restore <原路径>    # 传原路径（不是 archive/ 下的路径），把归档页接回来
 node tools\decay.mjs --today=2028-01-01    # 模拟日期（验收用）
+node tools\lint.mjs                         # 自检：frontmatter / trust / summary / index 完整性
+node tools\lint.mjs --root <目录> --json    # 检查别的库，机器可读输出
 ```
 
 `--apply` 会走 git 自动提交；`--dry-run` 保证零写入（验收要求 `git status` 为空）。
+
+## 怎么证明它真的能用
+
+docs/verification.md 里是 11 条能自己跑的检查：空跑零写入、两段计时、归档只移不删、一条命令接回正文逐字节一致、连跑两次不改、被纠正过的页不自动瘦身。
+
+破坏性操作一律在副本上做；动真库前整份备份（含 .git）。
 
 ## 三条硬规矩（踩过的坑）
 
@@ -146,3 +157,7 @@ MIT。不承诺维护；这是一份从实际使用里长出来的协议，不�
 ## 故事与完整说明
 
 为什么要做成这样、我们丢过什么、三条硬规矩怎么踩出来的：[docs/story-and-guide.md](docs/story-and-guide.md)。
+
+写给还在用记忆插件的人（可直接转发）：[docs/memory-is-not-notes.md](docs/memory-is-not-notes.md)。
+
+验收清单：[docs/verification.md](docs/verification.md)。
